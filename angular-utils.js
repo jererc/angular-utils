@@ -96,14 +96,52 @@
                     data[key] = [];
                     val.map(function(v) {
                         var isObj = angular.isObject(v);
-                        if (isObj ? v.val : v && isObj != !!toObj) {
-                            data[key].push(!!isObj ? v.val : {val: v});
+                        if (isObj == !!toObj) {
+                            data[key].push(v);
+                        } else {
+                            data[key].push(isObj ? v.val : {val: v});
                         }
                     });
                 } else if (angular.isObject(data[key])) {
                     this.formatPrimitives(data[key], keys, toObj);
                 }
             }
+        };
+
+    });
+
+    module.service('rootScopeSvc', function($rootScope, $location, utilsSvc) {
+
+        $rootScope.isMenuActive = function(path) {
+            if ($location.path().substr(0, path.length) == path) {
+                return 'active';
+            }
+            return '';
+        };
+
+        $rootScope.inArray = function(value, array) {
+            if (!array) {
+                return -1;
+            }
+            return utilsSvc.getIndex(value, array) != -1;
+        };
+
+        $rootScope.hasKeys = function(obj) {
+            for(var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        $rootScope.exists = function(val) {
+            if (angular.isArray(val)) {
+                return !!val.length;
+            } else if (typeof(val) == 'object') {
+                return $rootScope.hasKeys(val);
+            }
+            return !!val;
         };
 
     });
